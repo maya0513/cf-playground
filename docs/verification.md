@@ -12,7 +12,7 @@ Build OutputのWorkerディレクトリは`default`一つのみ。名前は`cf-p
 
 `just dev`でホームと14題材のHTTP 200、4101〜4114に題材サーバーがないこと、4100のローカルscheduled発火とCron履歴への保存を確認。Ctrl+Cで停止した。
 
-CIと新しいDeployの両workflowをactionlint 1.7.12とShellCheck 0.11.0で検査済み。Deployはmainの手動実行、CI成功後の本番ビルド・prebuilt dry-run・公開、production Environment、同時公開の直列化を設定した。ビルドとdry-runの子プロセスに親のAPIトークン・Turnstile secretを再導入しないこと、準備失敗時に公開しないこともテストした。GitHubリモートはmaya0513/cf-playgroundへ設定済みだが、workflowのpushと実際のActions実行は未実施。
+CIと新しいDeployの両workflowをactionlint 1.7.12とShellCheck 0.11.0で検査済み。Deployはmainの手動実行、CI成功後の本番ビルド・prebuilt dry-run・公開、production Environment、同時公開の直列化を設定した。ビルドとdry-runの子プロセスに親のAPIトークン・Turnstile secretを再導入しないこと、準備失敗時に公開しないこともテストした。GitHubリモートはmaya0513/cf-playground。初回commit `ade65ff`をmainへpushし、[実際のCI](https://github.com/maya0513/cf-playground/actions/runs/38047829205)も全ステップ成功した。production Environmentを作成し、デプロイ可能なブランチをmainだけに限定した。CLOUDFLARE_API_TOKENはユーザーがrepository secretへ登録済み。残りのVariablesとTurnstile secretは未設定。
 
 新しい`deploy:check`タスク（単一Workerのbuild→`cf deploy --prebuilt --mode production --dry-run --provision=false`）も成功。デプロイ処理はcfをモックし、必須設定の欠落、仮ID・公式テストキーの拒否、secretのJSONエンコード・ファイル権限、成功・書き込み失敗・アップロード失敗時の削除を検証した。実APIトークンの権限や本番secretを使ったアップロードは未確認。
 
@@ -48,4 +48,4 @@ CIと新しいDeployの両workflowをactionlint 1.7.12とShellCheck 0.11.0で検
 
 実アカウントの資源ID・secretでのdry-run、workers.devへの初回配置、KVの拠点間伝播、エッジCache、実Turnstile、AccessのIdPとパス単位ポリシー、実Cron/Queue/DO/Workflow、無料枠の消費は公開時に確認する。hostname/path単位Accessの手順は公式資料で確認済みだが、実アカウントでは未実施。
 
-GitHub接続後に実際のActions結果を確認する。
+Deploy workflowの実行は未実施。ローカルcfは未ログインのため、Cloudflare側の資源と認証設定はユーザーのブラウザ認証後に確認・準備する。

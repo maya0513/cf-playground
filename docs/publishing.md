@@ -2,7 +2,7 @@
 
 公開対象は **cf-playground の1 Workerのみ**。設定は`apps/00-home/cloudflare.config.ts`、入口は`apps/00-home/src/index.tsx`。14題材とCron/Queue consumer、Counter/ChatRoom/OrderWorkflow/Internalを同じWorkerに含める。`apps/14-internal`は名前付き入口のソースであり、独立したデプロイ対象ではない。
 
-この手順のリモート操作は未実行。リソース作成・secret登録・デプロイを実施する前に承認を得る。ローカルの`just setup`・`just build`・`just check`は認証不要。
+Cloudflare側のリモート操作は未実行。リソース作成・secret登録・デプロイを実施する前に承認を得る。ローカルの`just setup`・`just build`・`just check`は認証不要。
 
 ## 1. 準備するリソース
 
@@ -124,7 +124,7 @@ gh secret set CLOUDFLARE_API_TOKEN --env production --repo maya0513/cf-playgroun
 gh secret set CF_TURNSTILE_SECRET --env production --repo maya0513/cf-playground
 ```
 
-Actions > Deploy > Run workflowでbranch **main** を選ぶ。GitHubにworkflowをpushする必要がある。これらの設定変更、secret登録、push、workflow実行は今回行っていない。
+production Environmentとmain限定のbranch policyは作成済み。コードとworkflowの初回push、および[実CI](https://github.com/maya0513/cf-playground/actions/runs/38047829205)は成功した。CLOUDFLARE_API_TOKENはユーザーがrepository secretへ登録済みで、このEnvironmentからも参照できる。残りのVariablesとCF_TURNSTILE_SECRETはCloudflare側の準備後に登録する。公開時はActions > Deploy > Run workflowでbranch **main** を選ぶ。Deploy workflowはまだ実行していない。
 
 チェックjobへsecretを継承しない。公開jobでも依存インストールにはAPIトークンを渡さず、最後のVite Task `deploy`だけが受け取る。`deploy`内のビルド・dry-runの子プロセスからはAPIトークンとTurnstile secretを環境変数ごと取り除き、公開プロセスにだけ渡す。`scripts/deployment.ts`が設定を検証し、Turnstile secretを権限0600の一時JSONへ書き、cfに`--secrets-file`で渡す。secret値はコマンド引数に入れず、通常終了・書き込み失敗・アップロード失敗のいずれでも一時ディレクトリを削除する。secretファイルを成果物に保存しない。
 
