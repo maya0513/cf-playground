@@ -10,6 +10,7 @@ const config = defineConfig(({ mode }) => {
       compatibilityDate: "2026-10-10",
       compatibilityFlags: ["nodejs_compat"],
       workersDev: true,
+      cache: { enabled: true },
       observability: { enabled: true, traces: { enabled: true } },
       assets: { htmlHandling: "none" },
       exports: {

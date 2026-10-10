@@ -89,6 +89,16 @@ GitHub productionに7 Variablesを登録した。CLOUDFLARE_API_TOKENは既存�
 
 [公開手順](publishing.md)と`.env.example`で必要な値を一覧化した。課金設定の変更とデプロイは行っていない。
 
-workers.devへの初回配置、KVの拠点間伝播、エッジCache、実Turnstile、AccessのIdPとパス単位ポリシー、実Cron/Queue/DO/Workflow、無料枠の消費は公開時に確認する。hostname/path単位Accessのアプリ設定は実アカウントで完了したが、エッジでの保護・IdPログイン・JWT検証は未確認。
+KVの拠点間伝播、実Turnstileのchallenge・再利用拒否、Accessの本人によるIdPログイン完了・実JWT、Cronの時刻による自動発火、長期運用時の無料枠消費は未確認。初回配置・公開画面・実Queue/DO/WorkflowとAccessの未認証時の転送は、下記の本番確認で検証した。
 
-Deploy workflowの実行は未実施。GitHubに保存したAPI tokenの値は取得できないため、そのトークンの実際のアップロード権限は初回Deploy時に確認する。DO/Workflow/内部入口とQueue consumerも初回配置時に作成・設定される。
+Deploy workflowの実行は下記のとおり成功した。GitHubに保存したAPI tokenの値は取得せず、実際のアップロード権限をActionsで確認した。DO/Workflow/内部入口とQueue consumerも配置済み。
+
+## GitHub Actionsからの初回公開（2026-10-10）
+
+miseをユーザー指定のNode 24 / pnpm 12へ変更し、Node型定義も24系へ合わせた。justはユーザー変更に従ってmise管理から外した。Node 24.21.0で整形・型生成・lint・型検査・100%カバレッジ・本番bundleのブラウザ確認が成功した。
+
+空に戻したリモート履歴をmergeし、通常pushでmainへ反映。[pushのCI](https://github.com/maya0513/cf-playground/actions/runs/38052020558)と[初回Deploy](https://github.com/maya0513/cf-playground/actions/runs/38052162829)が成功した。Cloudflareの配置一覧でも単一のcf-playgroundの有効なバージョンと配信100%を確認した。
+
+公開URLは https://cf-playground.maya0513.workers.dev/ 。Chromiumで全19文書の日本語・HTML構造・目次・リンク・明るい配色・モバイル幅を確認。Access以外の13題材はSSRとhydrationが成功し、Accessの3パスは未認証でteamのログイン先へ302転送された。D1の登録・編集・削除、R2のバイナリ保存・取得・削除、SQLite DOの加減算、実Queue consumerの完了、実Workflowの待機・発送・完了、RPCのHTTP・型付き呼出し、KV読み込みと手動Cronによる履歴保存を確認。テスト用のブックマークとR2ファイルは削除し、カウンターは元に戻した。QueueとWorkflowの動作確認履歴は各1件残す。
+
+初回公開でWebSocketのコード省略時の切断が約10秒後に1006になることを再現。1000を明示すると約0.1秒で正常切断できたため、切断・再接続・unmountの全経路に1000を指定し、UIテストも追加した。Workers Cacheも初回は有効化設定が不足していたため、単一Workerにcache.enabledを追加し、設定の回帰検査を加えた。動的レスポンスは時刻APIのキャッシュ有効版以外no-storeを維持する。

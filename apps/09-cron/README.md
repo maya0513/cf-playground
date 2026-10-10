@@ -45,9 +45,9 @@ curl "http://127.0.0.1:4100/cdn-cgi/local/scheduled?cron=0%20*%20*%20*%20*"
 
 KVの更新伝播はローカルでの即時読取から判断しない。
 
-## 将来の公開・削除
+## 公開・削除
 
-今回公開していない。[公開手順](../../docs/publishing.md)で、単一Workerと必要な共通資源を準備する。ローカル識別子を実IDへ対応させ、localを使わずcf build→cf deploy。認証題材は本番設定を完成させてから実行する。
+公開済みサイトの変更も[公開手順](../../docs/publishing.md)で、単一Workerと必要な共通資源を準備する。ローカル識別子を実IDへ対応させ、localを使わずcf build→cf deploy。認証題材は本番設定を完成させてから実行する。
 
 Workerの削除は全題材を停止する。題材だけの削除は、共通設定のtrigger/bindingと参照を整理してから行う。共有D1を削除すると他の題材のデータも失われる。DOのexport削除は[cf構成資料](https://developers.cloudflare.com/cf/projects/cloudflare-config/)の状態移行を読む。保存データも失われる。
 

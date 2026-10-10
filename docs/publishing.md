@@ -1,19 +1,19 @@
-# 単一Workerの公開準備
+# 単一Workerの公開・削除手順
 
 公開対象は **cf-playground の1 Workerのみ**。設定は`apps/00-home/cloudflare.config.ts`、入口は`apps/00-home/src/index.tsx`。14題材とCron/Queue consumer、Counter/ChatRoom/OrderWorkflow/Internalを同じWorkerに含める。`apps/14-internal`は名前付き入口のソースであり、独立したデプロイ対象ではない。
 
-2026-10-10、ユーザーの委任に基づくリソース作成とGitHub設定を完了した。課金設定の変更とデプロイは未実施。追加のリソース作成・課金変更・デプロイは別途承認後に行う。ローカルの`just setup`・`just build`・`just check`は認証不要。
+2026-10-10、ユーザーの承認に基づきGitHub Actionsから初回公開を完了した。課金設定は変更していない。追加のリソース作成・課金変更・デプロイは別途承認後に行う。ローカルの`just setup`・`just build`・`just check`は認証不要。
 
-同日、ユーザーの承認を得て、それまでのpushを取り消し、GitHubのmainを空のルートコミットへ戻した。ローカルのコード・履歴とGitHubのSecrets・Variablesは保持している。現在GitHubのmainにはworkflowもないため、Actionsによる公開には、ユーザーが承認したpushによるコードとworkflowの再反映が必要。以下のworkflow説明はローカルの実装を対象とする。
+同日、ユーザーの承認を得て、それまでのpushを取り消し、GitHubのmainを空のルートコミットへ戻した。ローカルのコード・履歴とGitHubのSecrets・Variablesは保持している。その後、新たなpush・デプロイの明示承認を得て、空の履歴をmergeして通常pushでコードとworkflowを再反映した。
 
 ## 準備済みの設定
 
 - D1 `cf-playground`、KV Classic `cf-learn-notice` / `cf-learn-cron`、R2 Standard `cf-learn-files`、Queue `cf-learn-jobs`を作成済み。D1には3題材のSQLと初期ブックマーク1件を適用し、SELECTで確認した。これらを再作成する必要はない。
 - Turnstile `cf-playground`はManaged、許可hostnameは`cf-playground.maya0513.workers.dev`。秘密鍵をSiteverifyのダミー応答で検査し、ユーザーの明示承認後、GitHub productionの`CF_TURNSTILE_SECRET`へ直接登録した。秘密鍵はローカルへ保存していない。実challengeと再利用拒否は公開後に確認する。
 - Zero Trust Freeのteamは`spring-salad-cebc`。Accessアプリ`cf-playground Access`は`cf-playground.maya0513.workers.dev/access`と`/access/*`のみを対象とし、本人のCloudflareアカウントのメールアドレスだけを許可する再利用ポリシー`cf-playground-owner`を参照する。ログインには既存のCloudflare IdPを使い、セッションは1時間、CookieはHttpOnly・パス範囲指定を有効にした。他のWorkerやホームは保護対象に含めていない。
-- GitHub productionの7 VariablesとTurnstile secretは登録済み。`CLOUDFLARE_API_TOKEN`は既存のrepository secretを参照する。ローカルのgit対象外`.env`にも非秘密設定だけを保存した。
+- GitHub productionの7 VariablesとTurnstile secretは登録済み。`CLOUDFLARE_API_TOKEN`は既存のrepository secretを参照する。ローカルの`.env`は任意で、GitHub ActionsはGitHubのVariablesを使う。
 
-公開予定先は`https://cf-playground.maya0513.workers.dev/`。Deploy workflowはまだ実行していない。実トークンによるアップロード権限とAccessログイン等は公開後の確認対象。準備の検証結果は[検証記録](verification.md)に記載する。
+公開先は`https://cf-playground.maya0513.workers.dev/`。[初回Deploy](https://github.com/maya0513/cf-playground/actions/runs/38052162829)が成功し、実トークンによる公開権限も確認済み。Accessの未認証時の転送は確認済みで、本人によるログイン完了は未確認。[検証記録](verification.md)に確認範囲を記載する。
 
 ## 1. 準備するリソース
 
@@ -135,7 +135,7 @@ gh secret set CLOUDFLARE_API_TOKEN --env production --repo maya0513/cf-playgroun
 gh secret set CF_TURNSTILE_SECRET --env production --repo maya0513/cf-playground
 ```
 
-production Environmentとmain限定のbranch policyは作成済み。取り消し前のコードとworkflowでは[実CI](https://github.com/maya0513/cf-playground/actions/runs/38047829205)が成功した。CLOUDFLARE_API_TOKENはユーザーがrepository secretへ登録済みで、このEnvironmentからも参照できる。7 VariablesとCF_TURNSTILE_SECRETも登録済み。コードとworkflowを承認後に再反映したら、公開時はActions > Deploy > Run workflowでbranch **main** を選ぶ。Deploy workflowはまだ実行していない。
+production Environmentとmain限定のbranch policyは作成済み。取り消し前のコードとworkflowでは[実CI](https://github.com/maya0513/cf-playground/actions/runs/38047829205)が成功した。CLOUDFLARE_API_TOKENはユーザーがrepository secretへ登録済みで、このEnvironmentからも参照できる。7 VariablesとCF_TURNSTILE_SECRETも登録済み。公開時はActions > Deploy > Run workflowでbranch **main** を選ぶ。初回Deployは成功済み。
 
 チェックjobへsecretを継承しない。公開jobでも依存インストールにはAPIトークンを渡さず、最後のVite Task `deploy`だけが受け取る。`deploy`内のビルド・dry-runの子プロセスからはAPIトークンとTurnstile secretを環境変数ごと取り除き、公開プロセスにだけ渡す。`scripts/deployment.ts`が設定を検証し、Turnstile secretを権限0600の一時JSONへ書き、cfに`--secrets-file`で渡す。secret値はコマンド引数に入れず、通常終了・書き込み失敗・アップロード失敗のいずれでも一時ディレクトリを削除する。secretファイルを成果物に保存しない。
 

@@ -43,6 +43,9 @@ class Socket extends EventTarget {
 function expectSend(socket: Socket) {
   expect(socket.send).toHaveBeenCalled();
 }
+function expectNormalClose(socket: Socket) {
+  expect(socket.close).toHaveBeenCalledWith(1000);
+}
 function expectSecureUrl(url: string | undefined) {
   expect(url).toContain("wss:");
 }
@@ -130,6 +133,7 @@ it.each(Object.keys(modules))(
       });
       await act(async () => required(container.querySelectorAll("button")[2]).click());
       expectSend(ws);
+      expectNormalClose(ws);
       await act(() => {
         ws.readyState = 0;
       });

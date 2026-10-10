@@ -66,6 +66,11 @@ it("root tasks and browser/Worker configs are credential-free", async () => {
     "run.tasks.dev.cache",
     false,
   );
+  const { default: worker } = await import("../../apps/00-home/cloudflare.config.ts");
+  expect(worker({ mode: "production", isPreview: false })).toHaveProperty(
+    "worker.cache.enabled",
+    true,
+  );
   expect((await import("../../playwright.config.ts")).default.webServer).toHaveProperty("command");
   expect((await import("../workers/vitest.config.ts")).default).toHaveProperty(
     "test.maxWorkers",

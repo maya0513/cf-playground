@@ -84,4 +84,4 @@ Oxlintの型情報付き解析と型検査を有効にし、correctness/suspicio
 
 デプロイ準備は[公開手順](docs/publishing.md)と[設定のひな形](.env.example)を参照。アップロード前チェックは`pnpm exec vp run deploy:dry-run`です。[GitHub ActionsのDeploy](.github/workflows/deploy.yml)はmainを対象とする手動公開です。APIトークン権限とproduction Environmentのsecrets/variablesは[公開手順](docs/publishing.md#5-github-actionsから公開する)に記載しています。旧構成のローカルデータは移行せず、新しい単一Worker用の保存先で初期化します。
 
-今回はローカル実装と公開準備までです。リモート資源作成、課金設定、デプロイは実行していません。
+公開サイトは https://cf-playground.maya0513.workers.dev/ です。Access題材のみ認証が必要です。更新はCI成功後、GitHub ActionsのDeployを手動実行します。課金設定は変更していません。

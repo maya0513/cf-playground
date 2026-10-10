@@ -11,12 +11,12 @@ export function View({ initial }: { initial: { title: string } }) {
   const socket = useRef<WebSocket | null>(null);
   useEffect(
     () => () => {
-      socket.current?.close();
+      socket.current?.close(1000);
     },
     [],
   );
   function connect() {
-    socket.current?.close();
+    socket.current?.close(1000);
     const ws = new WebSocket(
       `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}${topicUrl(12, `/api/rooms/${room.value}/ws`)}`,
     );
@@ -57,7 +57,7 @@ export function View({ initial }: { initial: { title: string } }) {
         </select>
       </label>
       <button onClick={connect}>接続・再接続</button>
-      <button onClick={() => socket.current?.close()}>切断</button>
+      <button onClick={() => socket.current?.close(1000)}>切断</button>
       <label>
         メッセージ
         <textarea
