@@ -1,0 +1,38 @@
+name: Deploy
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cf-playground-production
+  cancel-in-progress: false
+jobs:
+  check:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/ci.yml
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    env:
+      CI: "true"
+      CF_SEND_TELEMETRY: "false"
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      CF_DB_ID: ${{ vars.CF_DB_ID }}
+      CF_NOTICE_NAMESPACE_ID: ${{ vars.CF_NOTICE_NAMESPACE_ID }}
+      CF_HISTORY_NAMESPACE_ID: ${{ vars.CF_HISTORY_NAMESPACE_ID }}
+      CF_TURNSTILE_SITEKEY: ${{ vars.CF_TURNSTILE_SITEKEY }}
+      CF_ACCESS_ISSUER: ${{ vars.CF_ACCESS_ISSUER }}
+      CF_ACCESS_AUDIENCE: ${{ vars.CF_ACCESS_AUDIENCE }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v5
+      - run: pnpm install --frozen-lockfile
+      - name: 本番ビルド・dry-run・同じビルドの公開
+        run: pnpm exec vp run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_TURNSTILE_SECRET: ${{ secrets.CF_TURNSTILE_SECRET }}

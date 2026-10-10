@@ -1,0 +1,4 @@
+[tools]
+just = "1"
+node = "26"
+pnpm = "12"

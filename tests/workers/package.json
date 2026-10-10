@@ -1,0 +1,13 @@
+{
+  "name": "@playground/worker-tests",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.4.0",
+    "@vitest/browser-preview": "^5.0.3",
+    "@vitest/coverage-istanbul": "^5.0.3",
+    "@vitest/ui": "^5.0.3",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.3"
+  }
+}

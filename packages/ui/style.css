@@ -1,0 +1,60 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #202020;
+  background: #fafafa;
+  line-height: 1.6;
+}
+body {
+  max-width: 56rem;
+  margin: auto;
+  padding: 1.5rem;
+}
+header,
+footer {
+  border-block-end: 1px solid #ccc;
+  padding: 1rem 0;
+}
+footer {
+  margin-top: 2rem;
+  color: #555;
+}
+main {
+  min-height: 60vh;
+}
+a {
+  color: #0755a1;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+button {
+  cursor: pointer;
+}
+label {
+  display: block;
+}
+textarea {
+  width: 100%;
+  min-height: 5rem;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  background: white;
+}
+li {
+  margin-block: 0.6rem;
+}
+:focus-visible {
+  outline: 2px solid #0755a1;
+  outline-offset: 2px;
+}

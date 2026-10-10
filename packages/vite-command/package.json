@@ -1,0 +1,12 @@
+{
+  "name": "@playground/vite-command",
+  "version": "0.0.0",
+  "private": true,
+  "bin": {
+    "vite": "./vite.mjs"
+  },
+  "type": "module",
+  "dependencies": {
+    "vite-plus": "^1.1.0"
+  }
+}

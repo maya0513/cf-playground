@@ -1,0 +1,35 @@
+{
+  "name": "cf-playground",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@preact/signals": "^2.11.3",
+    "hono": "^4.13.13",
+    "jose": "^6.2.12",
+    "preact": "^11.0.1",
+    "preact-iso": "^2.12.2",
+    "preact-render-to-string": "^6.8.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "2.0.0-beta.sha-91c870c02",
+    "@cloudflare/workers-types": "^5.20261009.1",
+    "@playwright/test": "^1.64.0",
+    "@preact/preset-vite": "^2.10.6",
+    "@types/istanbul-lib-coverage": "^2.0.6",
+    "@types/istanbul-lib-report": "^3.0.3",
+    "@types/istanbul-reports": "^3.0.4",
+    "@types/node": "^26.6.5",
+    "@vitest/coverage-istanbul": "^5.0.3",
+    "@vitest/istanbul-lib-instrument": "^1.0.2",
+    "cf": "1.0.0-beta.14",
+    "happy-dom": "^20.14.6",
+    "istanbul-lib-coverage": "^3.2.2",
+    "istanbul-lib-report": "^3.0.1",
+    "istanbul-reports": "^3.2.0",
+    "typescript": "^7.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@^1.1.0",
+    "vite-plus": "^1.1.0"
+  },
+  "packageManager": "pnpm@12.10.1"
+}

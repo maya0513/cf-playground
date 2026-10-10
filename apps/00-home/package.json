@@ -1,0 +1,11 @@
+{
+  "name": "@playground/00-home",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "2.0.0-beta.sha-91c870c02",
+    "@playground/vite-command": "workspace:*",
+    "cf": "1.0.0-beta.14",
+    "vite": "npm:@voidzero-dev/vite-plus-core@^1.1.0"
+  }
+}

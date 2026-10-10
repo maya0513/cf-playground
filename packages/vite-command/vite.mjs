@@ -1,0 +1,1 @@
+await import("./command.ts");

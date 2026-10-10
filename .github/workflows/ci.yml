@@ -1,0 +1,32 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CF_SEND_TELEMETRY: "false"
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v5
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec vp run ci:check 2>&1 | tee ci.log
+        shell: bash
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: verification-results
+          path: |
+            coverage/
+            playwright-report/
+            test-results/
+            ci.log
+          if-no-files-found: warn
