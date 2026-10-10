@@ -12,7 +12,7 @@ Build OutputのWorkerディレクトリは`default`一つのみ。名前は`cf-p
 
 `just dev`でホームと14題材のHTTP 200、4101〜4114に題材サーバーがないこと、4100のローカルscheduled発火とCron履歴への保存を確認。Ctrl+Cで停止した。
 
-CIと新しいDeployの両workflowをactionlint 1.7.12とShellCheck 0.11.0で検査済み。Deployはmainの手動実行、CI成功後の本番ビルド・prebuilt dry-run・公開、production Environment、同時公開の直列化を設定した。ビルドとdry-runの子プロセスに親のAPIトークン・Turnstile secretを再導入しないこと、準備失敗時に公開しないこともテストした。GitHubリモートはmaya0513/cf-playground。初回commit `ade65ff`をmainへpushし、[実際のCI](https://github.com/maya0513/cf-playground/actions/runs/38047829205)も全ステップ成功した。production Environmentを作成し、デプロイ可能なブランチをmainだけに限定した。CLOUDFLARE_API_TOKENはユーザーがrepository secretへ登録済み。残りのVariablesとTurnstile secretは未設定。
+CIと新しいDeployの両workflowをactionlint 1.7.12とShellCheck 0.11.0で検査済み。Deployはmainの手動実行、CI成功後の本番ビルド・prebuilt dry-run・公開、production Environment、同時公開の直列化を設定した。ビルドとdry-runの子プロセスに親のAPIトークン・Turnstile secretを再導入しないこと、準備失敗時に公開しないこともテストした。GitHubリモートはmaya0513/cf-playground。初回commit `ade65ff`をmainへpushし、[実際のCI](https://github.com/maya0513/cf-playground/actions/runs/38047829205)も全ステップ成功した。production Environmentを作成し、デプロイ可能なブランチをmainだけに限定した。CLOUDFLARE_API_TOKENはユーザーがrepository secretへ登録済み。7 VariablesとTurnstile secretも登録済み（下記参照）。
 
 新しい`deploy:check`タスク（単一Workerのbuild→`cf deploy --prebuilt --mode production --dry-run --provision=false`）も成功。デプロイ処理はcfをモックし、必須設定の欠落、仮ID・公式テストキーの拒否、secretのJSONエンコード・ファイル権限、成功・書き込み失敗・アップロード失敗時の削除を検証した。実APIトークンの権限や本番secretを使ったアップロードは未確認。
 
@@ -42,10 +42,31 @@ CIと新しいDeployの両workflowをactionlint 1.7.12とShellCheck 0.11.0で検
 - Cloudflare設定からimportした実行ファイルはViteのfs.denyに入る。公開画面も使うcatalogをCloudflare設定からimportしない。
 - cfのworkspace自動検出警告が出るが、公開対象のapps/00-homeは明示的な設定を持つ。グローバル設定は変更していない。
 
+## 実アカウントの公開準備で確認済み（2026-10-10）
+
+ローカルcfのOAuthログインで公開先アカウントmaya0513を確認。既存のD1/KV/R2/Queue/Turnstileがないことを調査後、このアプリ専用の以下を作成し、一覧の再取得で確認した。既存のしりとりサイトや課金設定は変更していない。
+
+| 種類           | 作成した資源                    | 確認結果                                                 |
+| -------------- | ------------------------------- | -------------------------------------------------------- |
+| D1             | cf-playground                   | bookmarks/jobs/ordersをSELECTで確認、初期ブックマーク1件 |
+| KV Classic     | cf-learn-notice / cf-learn-cron | 2 namespaceのIDを確認                                    |
+| R2 Standard    | cf-learn-files                  | APAC、Standardで作成                                     |
+| Queue          | cf-learn-jobs                   | 作成済み、consumerはデプロイ時に設定                     |
+| Turnstile Free | cf-playground                   | Managed、公開予定hostnameのみ、追加のEnterprise機能なし  |
+| Access Free    | cf-playground Access            | /accessと/access/*のみ、本人メールの再利用Allow policy   |
+
+Turnstileは秘密鍵をメモリ内だけで扱い、Siteverifyがダミートークンを`invalid-input-response`で拒否し、`invalid-input-secret`を返さないことを確認した。これは秘密鍵の受理確認であり、実challengeの成功・再利用拒否の確認ではない。ユーザーの明示承認を得てGitHub productionのCF_TURNSTILE_SECRETへ標準入力で直接登録し、値を取得せずsecret名を再確認した。
+
+ユーザーがZero Trust Freeを初期設定した後、組織のauth_domainがspring-salad-cebc.cloudflareaccess.comであること、既存アプリ・ポリシーがなくCloudflare IdPだけがあることを確認。専用の再利用ポリシーとパス単位アプリを作成した。本人のCloudflareアカウントのメールアドレスだけを許可し、session_duration=1h、HttpOnlyとpath_cookie_attributeを有効にした。作成後の一覧を再取得して対象パス・許可条件・IdP・Cookie設定を照合し、issuerの公開JWKSから署名鍵2件を取得できることも確認した。
+
+GitHub productionに7 Variablesを登録した。CLOUDFLARE_API_TOKENは既存のrepository secret、CF_TURNSTILE_SECRETはEnvironment secret。非秘密設定をローカルのgit対象外.envにも保存し、GitHubから再取得した7 Variablesが完全一致することを確認した。Secretは名前のみを再確認し、productionのmain限定も再取得して検証した。
+
+7つの実設定を使った`pnpm exec vp run deploy:check`も成功。単一Workerをビルドし、同じBuild Outputをprebuilt dry-runした。Turnstile/Access設定とD1/KV/R2/Queueのbindingを確認した。gzip後90.96KiB、アップロードと自動provisionは未実行。このdry-runはGitHubのAPI tokenによるアップロードや実ログインを検証するものではない。
+
 ## 実サービスで未確認
 
-リソース作成、課金設定、secret登録、デプロイは行っていない。[公開手順](publishing.md)と`.env.example`で必要な値を一覧化した。
+[公開手順](publishing.md)と`.env.example`で必要な値を一覧化した。課金設定の変更とデプロイは行っていない。
 
-実アカウントの資源ID・secretでのdry-run、workers.devへの初回配置、KVの拠点間伝播、エッジCache、実Turnstile、AccessのIdPとパス単位ポリシー、実Cron/Queue/DO/Workflow、無料枠の消費は公開時に確認する。hostname/path単位Accessの手順は公式資料で確認済みだが、実アカウントでは未実施。
+workers.devへの初回配置、KVの拠点間伝播、エッジCache、実Turnstile、AccessのIdPとパス単位ポリシー、実Cron/Queue/DO/Workflow、無料枠の消費は公開時に確認する。hostname/path単位Accessのアプリ設定は実アカウントで完了したが、エッジでの保護・IdPログイン・JWT検証は未確認。
 
-Deploy workflowの実行は未実施。ローカルcfは未ログインのため、Cloudflare側の資源と認証設定はユーザーのブラウザ認証後に確認・準備する。
+Deploy workflowの実行は未実施。GitHubに保存したAPI tokenの値は取得できないため、そのトークンの実際のアップロード権限は初回Deploy時に確認する。DO/Workflow/内部入口とQueue consumerも初回配置時に作成・設定される。

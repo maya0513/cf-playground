@@ -2,7 +2,16 @@
 
 公開対象は **cf-playground の1 Workerのみ**。設定は`apps/00-home/cloudflare.config.ts`、入口は`apps/00-home/src/index.tsx`。14題材とCron/Queue consumer、Counter/ChatRoom/OrderWorkflow/Internalを同じWorkerに含める。`apps/14-internal`は名前付き入口のソースであり、独立したデプロイ対象ではない。
 
-Cloudflare側のリモート操作は未実行。リソース作成・secret登録・デプロイを実施する前に承認を得る。ローカルの`just setup`・`just build`・`just check`は認証不要。
+2026-10-10、ユーザーの委任に基づくリソース作成とGitHub設定を完了した。課金設定の変更とデプロイは未実施。追加のリソース作成・課金変更・デプロイは別途承認後に行う。ローカルの`just setup`・`just build`・`just check`は認証不要。
+
+## 準備済みの設定
+
+- D1 `cf-playground`、KV Classic `cf-learn-notice` / `cf-learn-cron`、R2 Standard `cf-learn-files`、Queue `cf-learn-jobs`を作成済み。D1には3題材のSQLと初期ブックマーク1件を適用し、SELECTで確認した。これらを再作成する必要はない。
+- Turnstile `cf-playground`はManaged、許可hostnameは`cf-playground.maya0513.workers.dev`。秘密鍵をSiteverifyのダミー応答で検査し、ユーザーの明示承認後、GitHub productionの`CF_TURNSTILE_SECRET`へ直接登録した。秘密鍵はローカルへ保存していない。実challengeと再利用拒否は公開後に確認する。
+- Zero Trust Freeのteamは`spring-salad-cebc`。Accessアプリ`cf-playground Access`は`cf-playground.maya0513.workers.dev/access`と`/access/*`のみを対象とし、本人のCloudflareアカウントのメールアドレスだけを許可する再利用ポリシー`cf-playground-owner`を参照する。ログインには既存のCloudflare IdPを使い、セッションは1時間、CookieはHttpOnly・パス範囲指定を有効にした。他のWorkerやホームは保護対象に含めていない。
+- GitHub productionの7 VariablesとTurnstile secretは登録済み。`CLOUDFLARE_API_TOKEN`は既存のrepository secretを参照する。ローカルのgit対象外`.env`にも非秘密設定だけを保存した。
+
+公開予定先は`https://cf-playground.maya0513.workers.dev/`。Deploy workflowはまだ実行していない。実トークンによるアップロード権限とAccessログイン等は公開後の確認対象。準備の検証結果は[検証記録](verification.md)に記載する。
 
 ## 1. 準備するリソース
 
@@ -124,7 +133,7 @@ gh secret set CLOUDFLARE_API_TOKEN --env production --repo maya0513/cf-playgroun
 gh secret set CF_TURNSTILE_SECRET --env production --repo maya0513/cf-playground
 ```
 
-production Environmentとmain限定のbranch policyは作成済み。コードとworkflowの初回push、および[実CI](https://github.com/maya0513/cf-playground/actions/runs/38047829205)は成功した。CLOUDFLARE_API_TOKENはユーザーがrepository secretへ登録済みで、このEnvironmentからも参照できる。残りのVariablesとCF_TURNSTILE_SECRETはCloudflare側の準備後に登録する。公開時はActions > Deploy > Run workflowでbranch **main** を選ぶ。Deploy workflowはまだ実行していない。
+production Environmentとmain限定のbranch policyは作成済み。コードとworkflowの初回push、および[実CI](https://github.com/maya0513/cf-playground/actions/runs/38047829205)は成功した。CLOUDFLARE_API_TOKENはユーザーがrepository secretへ登録済みで、このEnvironmentからも参照できる。7 VariablesとCF_TURNSTILE_SECRETも登録済み。公開時はActions > Deploy > Run workflowでbranch **main** を選ぶ。Deploy workflowはまだ実行していない。
 
 チェックjobへsecretを継承しない。公開jobでも依存インストールにはAPIトークンを渡さず、最後のVite Task `deploy`だけが受け取る。`deploy`内のビルド・dry-runの子プロセスからはAPIトークンとTurnstile secretを環境変数ごと取り除き、公開プロセスにだけ渡す。`scripts/deployment.ts`が設定を検証し、Turnstile secretを権限0600の一時JSONへ書き、cfに`--secrets-file`で渡す。secret値はコマンド引数に入れず、通常終了・書き込み失敗・アップロード失敗のいずれでも一時ディレクトリを削除する。secretファイルを成果物に保存しない。
 
