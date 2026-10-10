@@ -45,6 +45,6 @@ it("all workspace manifests prohibit package scripts", async () => {
     expect(json).not.toHaveProperty("scripts");
   });
   const instructions = await readFile(new URL("../../mise.toml", import.meta.url), "utf8");
-  expect(instructions).toContain('node = "26"');
+  expect(instructions).toContain('node = "24"');
   expect(instructions).toContain('pnpm = "12"');
 });

@@ -16,7 +16,7 @@ just dev
 
 停止はCtrl+C。全題材の初期化は停止後に`just reset`。ローカルのデータだけを削除します。Cloudflareのログインや支払い設定は不要です。
 
-`just`だけでコマンド一覧を表示します。[justfile](justfile)は既存のVite Taskを呼ぶ入口です。justもmiseのメジャー指定で管理し、各レシピ内の`mise exec`でNodeとpnpmを揃えます。個別起動用のレシピはありません。
+`just`だけでコマンド一覧を表示します。[justfile](justfile)は既存のVite Taskを呼ぶ入口です。justは別途インストールし、各レシピ内の`mise exec`でNodeとpnpmを揃えます。個別起動用のレシピはありません。
 
 | コマンド     | 用途                                 |
 | ------------ | ------------------------------------ |
@@ -45,7 +45,7 @@ just dev
 | 13  | Workflows               | [13-workflows](apps/13-workflows/README.md)             |
 | 14  | Service Bindings・RPC   | [14-rpc](apps/14-rpc/README.md)                         |
 
-Node 26とpnpm 12はmiseのメジャー指定、ツールはVite Plus、画面はPreact/Signals、hydrationはpreact-iso、HTTPはHonoです。汎用の業務処理層を作らず、各題材の`src/index.tsx`にbinding操作を残しています。画面の共通コードは`packages/ui`、題材一覧とURLは`packages/catalog`、Viteの共通設定は`packages/tooling`です。ブラウザのURLはすべて4100のサブパスです。設定とデプロイ対象は`apps/00-home`の`cf-playground`一つ。HTTP・Cron・Queuesの入口、DO・Workflow・RPCのクラスを同じWorkerからexportします。RPCのINTERNAL bindingも同じWorker内の名前付き入口を呼びます。D1は1つのDB内の題材別テーブルで、その他のデータはbindingごとに分けます。静的アセットはassets-firstで配信します。
+Node 24とpnpm 12はmiseのメジャー指定、ツールはVite Plus、画面はPreact/Signals、hydrationはpreact-iso、HTTPはHonoです。汎用の業務処理層を作らず、各題材の`src/index.tsx`にbinding操作を残しています。画面の共通コードは`packages/ui`、題材一覧とURLは`packages/catalog`、Viteの共通設定は`packages/tooling`です。ブラウザのURLはすべて4100のサブパスです。設定とデプロイ対象は`apps/00-home`の`cf-playground`一つ。HTTP・Cron・Queuesの入口、DO・Workflow・RPCのクラスを同じWorkerからexportします。RPCのINTERNAL bindingも同じWorker内の名前付き入口を呼びます。D1は1つのDB内の題材別テーブルで、その他のデータはbindingごとに分けます。静的アセットはassets-firstで配信します。
 
 ## 検証
 
