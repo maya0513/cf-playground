@@ -1,9 +1,11 @@
 import { defineConfig } from "vite-plus";
 import { preact } from "@preact/preset-vite";
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { utf8TextAssets } from "./text-assets.ts";
 export function homeViteConfig() {
   return defineConfig({
     plugins: [
+      utf8TextAssets(),
       preact(),
       cloudflare({
         viteEnvironment: { name: "ssr" },

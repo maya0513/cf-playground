@@ -1,5 +1,19 @@
 # 検証記録
 
+## README文字化けの修正（2026-10-10）
+
+READMEの本文はUTF-8だが、開発時のViteが`Content-Type: text/plain`だけで配信していた。開発用middlewareと本番Static Assetsの`public/_headers`で、テキストファイルに`text/plain; charset=utf-8`を設定した。
+
+全14README・ロードマップ・Static Assetsのサンプルを、開発サーバーと本番bundleのローカルpreviewの両方でChromium確認した。ブラウザのdocument.characterSetがUTF-8で、表示本文がUTF-8のソース全文と一致することを検査した。本番へのアップロードは行っていない。
+
+Node/UI 114テスト、Workers 20テスト、Playwright 4テストが成功。自作77ファイルで行736/736、文794/794、関数254/254、分岐274/274となり、全体・ファイル単位とも100%。整形・型生成・警告ゼロのlint・型検査も成功。Playwrightはユーザーの開発サーバーを停止せず、一時設定で既存サーバーを再利用して実行した。本番確認では通常のbuildスクリプトで単一Workerをビルドし、起動したpreviewだけを終了した。
+
+## GitHubへのpushの取り消し（2026-10-10）
+
+ユーザーの明示承認を得て、GitHubのmainをファイルも親コミットもないルートコミット`18bfdfe`へ戻した。直前のmainが想定SHAと一致する場合だけ更新するforce-with-leaseを使用。ローカルのmain・コード・3コミットは保持した。GitHub APIで空treeのSHAを確認し、repositoryのCLOUDFLARE_API_TOKEN、productionのCF_TURNSTILE_SECRETと7 Variablesが残っていることも確認した。
+
+過去のCI成功は以下の履歴として残す。現在GitHubのmainは空で、今回の修正はpushしていない。AGENTS.mdはユーザーが破棄した状態を維持した。
+
 ## 確認済み（2026-10-10・単一Worker化後）
 
 `pnpm exec vp run ci:check`が成功。Node/UI 107テスト、Workers 20テスト、Playwright 3テストが成功。自作実行コード76ファイルをIstanbulで計測し、行730/730、文787/787、関数251/251、分岐270/270。全体・各ファイルの4指標が100%。型生成、警告ゼロのlint、型検査、単一Workerのcf buildと出力検査も成功。

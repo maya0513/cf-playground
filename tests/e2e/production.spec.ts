@@ -5,6 +5,7 @@ import { createWriteStream } from "node:fs";
 import { test, expect } from "@playwright/test";
 import { catalog } from "../../packages/catalog/index.ts";
 import { sequential } from "../../packages/catalog/sequential.ts";
+import { checkGuides } from "./guides.ts";
 
 test("the single production Worker serves all topics, assets, APIs and WebSockets", async ({
   browser,
@@ -64,6 +65,7 @@ test("the single production Worker serves all topics, assets, APIs and WebSocket
       .toBe(200);
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
+    await checkGuides(page, "http://127.0.0.1:4200");
     await sequential(catalog, async (topic) => {
       const response = await page.goto(`http://127.0.0.1:4200${topic.path}`);
       expect(response?.status()).toBe(200);

@@ -1,0 +1,3 @@
+# README・ロードマップ・Static AssetsのテキストをUTF-8で表示する。
+/*.txt
+  Content-Type: text/plain; charset=utf-8

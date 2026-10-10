@@ -4,6 +4,8 @@
 
 2026-10-10、ユーザーの委任に基づくリソース作成とGitHub設定を完了した。課金設定の変更とデプロイは未実施。追加のリソース作成・課金変更・デプロイは別途承認後に行う。ローカルの`just setup`・`just build`・`just check`は認証不要。
 
+同日、ユーザーの承認を得て、それまでのpushを取り消し、GitHubのmainを空のルートコミットへ戻した。ローカルのコード・履歴とGitHubのSecrets・Variablesは保持している。現在GitHubのmainにはworkflowもないため、Actionsによる公開には、ユーザーが承認したpushによるコードとworkflowの再反映が必要。以下のworkflow説明はローカルの実装を対象とする。
+
 ## 準備済みの設定
 
 - D1 `cf-playground`、KV Classic `cf-learn-notice` / `cf-learn-cron`、R2 Standard `cf-learn-files`、Queue `cf-learn-jobs`を作成済み。D1には3題材のSQLと初期ブックマーク1件を適用し、SELECTで確認した。これらを再作成する必要はない。
@@ -133,7 +135,7 @@ gh secret set CLOUDFLARE_API_TOKEN --env production --repo maya0513/cf-playgroun
 gh secret set CF_TURNSTILE_SECRET --env production --repo maya0513/cf-playground
 ```
 
-production Environmentとmain限定のbranch policyは作成済み。コードとworkflowの初回push、および[実CI](https://github.com/maya0513/cf-playground/actions/runs/38047829205)は成功した。CLOUDFLARE_API_TOKENはユーザーがrepository secretへ登録済みで、このEnvironmentからも参照できる。7 VariablesとCF_TURNSTILE_SECRETも登録済み。公開時はActions > Deploy > Run workflowでbranch **main** を選ぶ。Deploy workflowはまだ実行していない。
+production Environmentとmain限定のbranch policyは作成済み。取り消し前のコードとworkflowでは[実CI](https://github.com/maya0513/cf-playground/actions/runs/38047829205)が成功した。CLOUDFLARE_API_TOKENはユーザーがrepository secretへ登録済みで、このEnvironmentからも参照できる。7 VariablesとCF_TURNSTILE_SECRETも登録済み。コードとworkflowを承認後に再反映したら、公開時はActions > Deploy > Run workflowでbranch **main** を選ぶ。Deploy workflowはまだ実行していない。
 
 チェックjobへsecretを継承しない。公開jobでも依存インストールにはAPIトークンを渡さず、最後のVite Task `deploy`だけが受け取る。`deploy`内のビルド・dry-runの子プロセスからはAPIトークンとTurnstile secretを環境変数ごと取り除き、公開プロセスにだけ渡す。`scripts/deployment.ts`が設定を検証し、Turnstile secretを権限0600の一時JSONへ書き、cfに`--secrets-file`で渡す。secret値はコマンド引数に入れず、通常終了・書き込み失敗・アップロード失敗のいずれでも一時ディレクトリを削除する。secretファイルを成果物に保存しない。
 

@@ -2,6 +2,10 @@ import { numericId, stringId } from "../json.ts";
 import { sequential } from "../../packages/catalog/sequential.ts";
 import { test, expect } from "@playwright/test";
 import { catalog } from "../../packages/catalog/index.ts";
+import { checkGuides } from "./guides.ts";
+test("all README pages and the roadmap display Japanese as UTF-8", async ({ page }) => {
+  await checkGuides(page, "http://localhost:4100");
+});
 test("SSR without JavaScript includes all fourteen learning links", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
