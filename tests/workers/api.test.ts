@@ -120,6 +120,24 @@ beforeAll(async () => {
 });
 afterEach(() => vi.restoreAllMocks());
 
+it("serves readable guides and redirects old URLs while keeping queries", async () => {
+  const response = await request(home, "/guides/03-d1/");
+  expect(response.status).toBe(200);
+  expect(response.headers.get("Content-Type")).toBe("text/html; charset=utf-8");
+  const html = await response.text();
+  expect(html).toContain('aria-label="目次"');
+  expect(html).toContain('class="guide-content"');
+  expect(html).toContain('href="/d1/"');
+  await sequential(["/guides/03-d1?from=home", "/guides/03-d1.txt?from=home"], async (path) => {
+    const redirect = await request(home, path);
+    expect(redirect.status).toBe(308);
+    expect(redirect.headers.get("Location")).toBe("https://demo.local/guides/03-d1/?from=home");
+  });
+  await sequential(["/guides/missing/", "/guides/missing", "/guides/missing.txt"], async (path) => {
+    expect((await request(home, path)).status).toBe(404);
+  });
+});
+
 it("SSR pages and both types of 404; credentials are never echoed", async () => {
   await sequential(
     [

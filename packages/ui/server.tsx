@@ -35,7 +35,7 @@ export function fail(
   });
 }
 
-export async function page<T extends object>(
+export async function page<T extends { title: string }>(
   request: Request,
   assets: Fetcher,
   View: ComponentType<{ initial: T }>,
@@ -46,6 +46,7 @@ export async function page<T extends object>(
   );
   if (!shell.ok) throw new Error("SSR shell is missing");
   const html = (await shell.text())
+    .replace(/<title>[^<]*<\/title>/, await renderToStringAsync(<title>{initial.title}</title>))
     .replace("<!--app-->", await renderToStringAsync(<View initial={initial} />))
     .replace(
       "<!--data-->",

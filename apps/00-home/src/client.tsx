@@ -2,6 +2,7 @@ import { mount } from "../../../packages/ui/client.tsx";
 import "../../../packages/ui/style.css";
 import { topicForPath } from "../../../packages/catalog/index.ts";
 import { View, initialSchema } from "./view.tsx";
+import { GuideView, guideSchema } from "../../../packages/ui/guide.tsx";
 const clients = {
   "01-workers": () => import("../../01-workers/src/client.tsx"),
   "02-assets": () => import("../../02-assets/src/client.tsx"),
@@ -20,4 +21,5 @@ const clients = {
 };
 const topic = topicForPath(location.pathname);
 if (topic) await clients[topic.slug]();
+else if (location.pathname.startsWith("/guides/")) mount(GuideView, guideSchema);
 else mount(View, initialSchema);

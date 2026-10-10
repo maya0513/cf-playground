@@ -1,8 +1,82 @@
 :root {
+  color-scheme: light;
   font-family: system-ui, sans-serif;
   color: #202020;
   background: #fafafa;
   line-height: 1.6;
+}
+
+.guide-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+.guide-source {
+  color: #555;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.guide-toc {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 0.3rem;
+  padding: 1rem 1.5rem;
+  margin-block: 2rem;
+}
+.guide-toc h2 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+.guide-toc ol {
+  padding-left: 1.4rem;
+  margin-bottom: 0;
+}
+.guide-toc li {
+  margin-block: 0.25rem;
+}
+.guide-content {
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+.guide-content h2 {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.35rem;
+  margin-top: 2.5rem;
+  scroll-margin-top: 1rem;
+}
+.guide-content :not(pre) > code {
+  background: #eee;
+  padding: 0.1em 0.3em;
+  border-radius: 0.2rem;
+}
+.guide-content pre {
+  white-space: pre;
+  overflow-x: auto;
+  background: #f3f4f5;
+  line-height: 1.6;
+}
+.guide-content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.guide-content th,
+.guide-content td {
+  border: 1px solid #ccc;
+  padding: 0.65rem 0.8rem;
+  min-width: 6rem;
+  text-align: left;
+}
+.guide-content th {
+  background: #eee;
+}
+.guide-content blockquote {
+  margin-inline: 0;
+  padding-left: 1rem;
+  border-left: 3px solid #bbb;
+  color: #555;
 }
 body {
   max-width: 56rem;

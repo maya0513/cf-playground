@@ -9,15 +9,14 @@ export function View({ initial }: { initial: { title: string } }) {
       <ol>
         {catalog.map((topic) => (
           <li key={topic.slug}>
-            <a href={topic.path}>{topic.title}</a> —{" "}
-            <a href={`/guides/${topic.slug}.txt`}>README</a>
+            <a href={topic.path}>{topic.title}</a> — <a href={`/guides/${topic.slug}/`}>README</a>
             <br />
             <code>apps/{topic.slug}/src/index.tsx</code>
           </li>
         ))}
       </ol>
       <p>
-        <a href="/guides/roadmap.txt">今後のロードマップ</a>
+        <a href="/guides/roadmap/">今後のロードマップ</a>
       </p>
     </Layout>
   );

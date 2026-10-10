@@ -138,6 +138,10 @@ test("the single production Worker serves all topics, assets, APIs and WebSocket
     ).toContain("ページがありません。");
     await context.close();
     const hydrated = await browser.newPage();
+    await hydrated.goto("http://127.0.0.1:4200/guides/03-d1/");
+    await expect(hydrated.locator("#app")).toHaveAttribute("data-hydrated", "true");
+    await hydrated.reload();
+    await expect(hydrated.locator("#app")).toHaveAttribute("data-hydrated", "true");
     await hydrated.goto("http://127.0.0.1:4200/workers/");
     await expect(hydrated.locator("#app")).toHaveAttribute("data-hydrated", "true");
     await hydrated.getByRole("button", { name: "GETを観察" }).click();

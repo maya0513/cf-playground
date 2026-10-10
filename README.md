@@ -12,6 +12,8 @@ just dev
 
 <http://localhost:4100/> を開いて題材へ移動します。`just dev`は全14題材を持つWorkerを1つ起動します。
 
+ホームのREADMEリンクは、同じ配色のHTML閲覧ページを開きます。見出しの目次、コード・表、題材へ戻るリンクがあり、JavaScriptなしでも読めます。原稿は各`apps/*/README.md`と`docs/*.md`を直接使うため、テキストファイルへの複製は不要です。以前の`/guides/*.txt`は新しい閲覧URLへ転送します。
+
 停止はCtrl+C。全題材の初期化は停止後に`just reset`。ローカルのデータだけを削除します。Cloudflareのログインや支払い設定は不要です。
 
 `just`だけでコマンド一覧を表示します。[justfile](justfile)は既存のVite Taskを呼ぶ入口です。justもmiseのメジャー指定で管理し、各レシピ内の`mise exec`でNodeとpnpmを揃えます。個別起動用のレシピはありません。

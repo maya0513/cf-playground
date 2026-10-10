@@ -1,5 +1,13 @@
 # 検証記録
 
+## READMEをHTML閲覧ページへ変更（2026-10-10）
+
+全14READMEとdocsの5文書を、元のMarkdownからSSRする白背景のページへ変更した。目次のアンカー、見出し、コード、表、学習ホーム・題材への導線を用意。文書間の相対リンクを閲覧URLへ解決し、ブラウザのタブにも文書タイトルを表示する。publicの重複原稿は削除し、旧txt URLはクエリを保持した308で転送する。
+
+markdown-itはHTML無効で使用し、生HTML・危険なURLを実行しないこと、コード例内のリンク記述を変換しないことを検証した。開発サーバーと本番bundleのローカルpreviewで全19文書、目次移動、資料間移動、戻るリンク、日本語、ダークモードでも明るい配色、390px幅でページが横にはみ出さないことを確認。JavaScript無効のSSRと有効時のhydrationも確認した。
+
+Node/UI 118テスト、Workers 21テスト、Playwright 4テストが成功。自作80ファイルの行775/775・文839/839・関数266/266・分岐301/301で、全体・各ファイルとも100%。整形、型生成、警告ゼロのlint、型検査も成功。ユーザーの開発サーバーを維持するため、Playwrightは一時設定で既存サーバーを再利用した。push・デプロイ・AGENTS.md・justfileの変更は行っていない。
+
 ## README文字化けの修正（2026-10-10）
 
 READMEの本文はUTF-8だが、開発時のViteが`Content-Type: text/plain`だけで配信していた。開発用middlewareと本番Static Assetsの`public/_headers`で、テキストファイルに`text/plain; charset=utf-8`を設定した。

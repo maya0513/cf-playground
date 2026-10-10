@@ -3,8 +3,12 @@ import { sequential } from "../../packages/catalog/sequential.ts";
 import { test, expect } from "@playwright/test";
 import { catalog } from "../../packages/catalog/index.ts";
 import { checkGuides } from "./guides.ts";
-test("all README pages and the roadmap display Japanese as UTF-8", async ({ page }) => {
+test("README pages are readable HTML with navigation and hydration", async ({ page }) => {
   await checkGuides(page, "http://localhost:4100");
+  await page.goto("http://localhost:4100/guides/03-d1/");
+  await expect(page.locator("#app")).toHaveAttribute("data-hydrated", "true");
+  await page.reload();
+  await expect(page.locator("#app")).toHaveAttribute("data-hydrated", "true");
 });
 test("SSR without JavaScript includes all fourteen learning links", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });

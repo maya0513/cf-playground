@@ -4,6 +4,8 @@ import { configureApp, finish, page } from "../../../packages/ui/server.tsx";
 import { canonicalTopicUrl } from "../../../packages/catalog/routing.ts";
 import { topicForPath } from "../../../packages/catalog/index.ts";
 import { View } from "./view.tsx";
+import { getGuide } from "../../../packages/ui/guides.ts";
+import { GuideView } from "../../../packages/ui/guide.tsx";
 import topic1 from "../../01-workers/src/index.tsx";
 import topic2 from "../../02-assets/src/index.tsx";
 import topic3 from "../../03-d1/src/index.tsx";
@@ -42,6 +44,17 @@ const handlers = {
 };
 const app = configureApp(new Hono<{ Bindings: Pick<Env, "ASSETS"> }>());
 app.get("/", (c) => page(c.req.raw, c.env.ASSETS, View, { title: "学習ホーム" }));
+app.get("/guides/:slug/", (c) => {
+  const guide = getGuide(c.req.param("slug"));
+  return guide ? page(c.req.raw, c.env.ASSETS, GuideView, guide) : c.notFound();
+});
+app.get("/guides/:slug", (c) => {
+  const slug = c.req.param("slug").replace(/\.txt$/, "");
+  if (!getGuide(slug)) return c.notFound();
+  const url = new URL(c.req.url);
+  url.pathname = `/guides/${slug}/`;
+  return c.redirect(url.href, 308);
+});
 const home = finish(app);
 export default {
   fetch(request: Request, env: Env, ctx: ExecutionContext) {
